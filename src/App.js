@@ -7,7 +7,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       input: '',
-      todo: [],
+      todo: JSON.parse(localStorage.getItem('todos')) || [],
     };
   }
 
@@ -17,6 +17,9 @@ class App extends React.Component {
   };
 
   handelClick = () => {
+    if (this.state.input.length === 0) {
+      return alert("Please introduce your task!!!");
+    }
     const newItem = {
       id: new Date(),
       text: this.state.input,
@@ -27,6 +30,32 @@ class App extends React.Component {
       input: '',
       todo: this.state.todo.concat(newItem),
     });
+  };
+
+  handelTick = (item) => {
+    const greenFrame = this.state.todo.map(todo => {
+      if (todo.id === item.id) {
+        todo.status = !todo.status;
+      }
+      return todo;
+    });
+
+    this.setState({
+      todo: greenFrame
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)));
+  };
+
+  handleRemove = (item) => {
+    const removedItem = this.state.todo.filter(todo => {
+      if (todo.id !== item.id) {
+        return todo;
+      }
+
+    });
+
+    this.setState({
+      todo: removedItem
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)));
   };
 
 
@@ -44,7 +73,9 @@ class App extends React.Component {
             <p id="total-todos"></p>
             <p id="completed-todos"></p>
           </div>
-          <AppTodoList todo={this.state.todo} />
+          <AppTodoList todo={this.state.todo}
+            handelTick={this.handelTick}
+            handleRemove={this.handleRemove} />
         </div>
       </div>
     );
