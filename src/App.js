@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import AppTodoList from './AppTodoList';
+import AppToDoListStats from './AppToDoListStats';
 
 class App extends React.Component {
   constructor(props) {
@@ -8,6 +9,7 @@ class App extends React.Component {
     this.state = {
       input: '',
       todo: JSON.parse(localStorage.getItem('todos')) || [],
+      checkedItems: JSON.parse(localStorage.getItem('completed')) || []
     };
   }
 
@@ -29,26 +31,38 @@ class App extends React.Component {
     this.setState({
       input: '',
       todo: this.state.todo.concat(newItem),
-    });
-  };
-
-  handelTick = (item) => {
-    const greenFrame = this.state.todo.map(todo => {
-      if (todo.id === item.id) {
-        todo.status = !todo.status;
-      }
-      return todo;
-    });
-
-    this.setState({
-      todo: greenFrame
     }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)));
   };
 
+  handelTick = (item) => {
+    const greenFrame = this.state.todo.map(todoItem => {
+      if (todoItem.id === item.id) {
+        todoItem.status = !todoItem.status;
+      }
+      return todoItem;
+    });
+
+    const checkedTodoItems = this.state.todo.filter(checkedTodoItems => {
+      if (checkedTodoItems.status === true) {
+        return checkedTodoItems;
+      }
+      else { return null; }
+
+    });
+
+    this.setState({
+      todo: greenFrame,
+      checkedItems: checkedTodoItems
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
+      localStorage.setItem('completed', JSON.stringify(this.state.checkedItems))
+    );
+
+  };
+
   handleRemove = (item) => {
-    const removedItem = this.state.todo.filter(todo => {
-      if (todo.id !== item.id) {
-        return todo;
+    const removedItem = this.state.todo.filter(todoItem => {
+      if (todoItem.id !== item.id) {
+        return todoItem;
       }
 
     });
@@ -59,7 +73,10 @@ class App extends React.Component {
   };
 
 
+
+
   render() {
+
     return (
       <div className="container">
         <h1>Our awesome TODO</h1>
@@ -69,10 +86,9 @@ class App extends React.Component {
             <button id="todo-add" onClick={this.handelClick}>Add</button>
           </div>
           {this.state.input.length ? <span id="counter"> {this.state.input.length} </span> : null}
-          <div className="todos-text">
-            <p id="total-todos"></p>
-            <p id="completed-todos"></p>
-          </div>
+          <AppToDoListStats todo={this.state.todo}
+            handleReset={this.handleReset}
+            checkedItems={this.state.checkedItems} />
           <AppTodoList todo={this.state.todo}
             handelTick={this.handelTick}
             handleRemove={this.handleRemove} />
