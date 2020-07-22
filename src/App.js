@@ -9,7 +9,6 @@ class App extends React.Component {
     this.state = {
       input: '',
       todo: JSON.parse(localStorage.getItem('todos')) || [],
-      checkedItems: JSON.parse(localStorage.getItem('completed')) || [],
     };
   }
 
@@ -42,19 +41,10 @@ class App extends React.Component {
       return todoItem;
     });
 
-    const checkedTodoItems = this.state.todo.filter(checkedTodoItems => {
-      if (checkedTodoItems.status === true) {
-        return checkedTodoItems;
-      } else {
-        return null;
-      }
-    });
 
     this.setState({
       todo: greenFrame,
-      checkedItems: checkedTodoItems
-    }, () => localStorage.setItem('completed', JSON.stringify(this.state.checkedItems)),
-      localStorage.setItem('todos', JSON.stringify(this.state.todo)),
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
 
     );
 
@@ -67,35 +57,23 @@ class App extends React.Component {
       }
     });
 
-    const checkedTodoItems = this.state.todo.filter(checkedTodoItems => {
-      if (checkedTodoItems === item) {
-        return !checkedTodoItems.status;
-      } else {
-        return null;
-      }
-    });
-
     this.setState({
       todo: removedItem,
-      checkedItems: checkedTodoItems
     }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
-      localStorage.setItem('completed', JSON.stringify(this.state.checkedItems)),
     );
   };
 
-  handleReset = (event) => {
-    const resetStatus = this.state.todo.filter(item => {
-      if (item.status === true) {
-        return !item.status;
-      } else { return null; }
+  handleReset = () => {
+    const removedCompleted = this.state.todo.filter(completedItem => {
+      completedItem.status = false;
+      return completedItem;
+
     });
 
-    if (event.target) {
-      this.setState({
-
-        checkedItems: resetStatus
-      });
-    }
+    this.setState({
+      todo: removedCompleted,
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
+    );
 
   };
 
