@@ -9,7 +9,7 @@ class App extends React.Component {
     this.state = {
       input: '',
       todo: JSON.parse(localStorage.getItem('todos')) || [],
-      checkedItems: JSON.parse(localStorage.getItem('completed')) || []
+      checkedItems: JSON.parse(localStorage.getItem('completed')) || [],
     };
   }
 
@@ -45,16 +45,17 @@ class App extends React.Component {
     const checkedTodoItems = this.state.todo.filter(checkedTodoItems => {
       if (checkedTodoItems.status === true) {
         return checkedTodoItems;
+      } else {
+        return null;
       }
-      else { return null; }
-
     });
 
     this.setState({
       todo: greenFrame,
       checkedItems: checkedTodoItems
-    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
-      localStorage.setItem('completed', JSON.stringify(this.state.checkedItems))
+    }, () => localStorage.setItem('completed', JSON.stringify(this.state.checkedItems)),
+      localStorage.setItem('todos', JSON.stringify(this.state.todo)),
+
     );
 
   };
@@ -64,12 +65,38 @@ class App extends React.Component {
       if (todoItem.id !== item.id) {
         return todoItem;
       }
+    });
 
+    const checkedTodoItems = this.state.todo.filter(checkedTodoItems => {
+      if (checkedTodoItems === item) {
+        return !checkedTodoItems.status;
+      } else {
+        return null;
+      }
     });
 
     this.setState({
-      todo: removedItem
-    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)));
+      todo: removedItem,
+      checkedItems: checkedTodoItems
+    }, () => localStorage.setItem('todos', JSON.stringify(this.state.todo)),
+      localStorage.setItem('completed', JSON.stringify(this.state.checkedItems)),
+    );
+  };
+
+  handleReset = (event) => {
+    const resetStatus = this.state.todo.filter(item => {
+      if (item.status === true) {
+        return !item.status;
+      } else { return null; }
+    });
+
+    if (event.target) {
+      this.setState({
+
+        checkedItems: resetStatus
+      });
+    }
+
   };
 
 
